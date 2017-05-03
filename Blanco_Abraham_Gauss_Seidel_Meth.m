@@ -46,37 +46,37 @@ DX = 2*pi/(M+1);
 A = 1/DX.^2;
 DY = 2*pi/(N+1);
 B = 1/DY.^2;
-DEN = -2*(A+B);
+R = -2*(A+B);
 
 % normalize elements
-A = A/DEN;
-B = B/DEN;
-F = F/DEN;
-H = H/DEN;
+A = A/R;
+B = B/R;
+F = F/R;
+H = H/R;
 
-DEN = 1;
+R = 1;
 error=10;
 error_iterations=0;
 % check for diagonal dominance of elements
-abs(DEN) >= abs(2*A+2*B);
+abs(R) >= abs(2*A+2*B);
 while error>10^-10;
    W1=U;
    W2=H1;
 for j = 2:M+1;
     
     % Left boundary
-    U(j,1) = DEN*(  F(j,1) - (2*B)*U(j,2) - A*U(j-1,1) - A*U(j+1,1) );
-    H1(j,1) = DEN*(  H(j,1) - (2*B)*H1(j,2) - A*H1(j-1,1) - A*H1(j+1,1) );
+    U(j,1) = (  F(j,1) - (2*B)*U(j,2) - A*U(j-1,1) - A*U(j+1,1) );
+    H1(j,1) = (  H(j,1) - (2*B)*H1(j,2) - A*H1(j-1,1) - A*H1(j+1,1) );
     % Right Boundary
-    U(j,end) = DEN*(  F(j,end) - (2*B)*U(j,end-1) - A*U(j-1,end) - A*U(j+1,end) );
-    H1(j,end) = DEN*(  H(j,end) - (2*B)*H1(j,end-1) - A*H1(j-1,end) - A*H1(j+1,end) );
+    U(j,end) = (  F(j,end) - (2*B)*U(j,end-1) - A*U(j-1,end) - A*U(j+1,end) );
+    H1(j,end) = (  H(j,end) - (2*B)*H1(j,end-1) - A*H1(j-1,end) - A*H1(j+1,end) );
 end
 %% Main Sweep of Gauss-Siedel
 
 for k = 2:N+1;
     for j = 2:M+1;
-        U(j,k) = DEN*(  F(j,k) - B*U(j,k-1) - B*U(j,k+1)- A*U(j-1,k) - A*U(j+1,k) );
-        H1(j,k) = DEN*(  H(j,k) - B*H1(j,k-1) - B*H1(j,k+1)- A*H1(j-1,k) - A*H1(j+1,k) );
+        U(j,k) = (  F(j,k) - B*U(j,k-1) - B*U(j,k+1)- A*U(j-1,k) - A*U(j+1,k) );
+        H1(j,k) = (  H(j,k) - B*H1(j,k-1) - B*H1(j,k+1)- A*H1(j-1,k) - A*H1(j+1,k) );
     end
 end
 error=abs(max(max(((W1-U)./W1))));
