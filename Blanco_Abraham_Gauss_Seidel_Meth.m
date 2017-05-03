@@ -79,7 +79,6 @@ for k = 2:N+1;
         H1(j,k) = DEN*(  H(j,k) - B*H1(j,k-1) - B*H1(j,k+1)- A*H1(j-1,k) - A*H1(j+1,k) );
     end
 end
-end
 error=abs(max(max(((W1-U)./W1))));
 error=abs(max(max(((W2-H1)./W2))));
 error_iterations=error_iterations+1
