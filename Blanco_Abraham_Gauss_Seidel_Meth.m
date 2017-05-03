@@ -7,6 +7,7 @@ ay = 0;
 bx = 2*pi;
 by = 2*pi;
 % Define the number of points on the interior (this does not include the exterior boundary points)
+%lamda=input('Value of lamda=');
 M=input('Value of X Intenal Nodes=');
 N=input('Value of Y Internal Nodes=');
 tic %time begins here after inputs are set
@@ -30,15 +31,16 @@ end
 %% Boundary Conditions for "Left" and "Right" side of Matrix
 
 % Left boundary values (Dirchelet Condition)
-phi_ab = ((yvalues - ay).^2 ) .* sin( pi *(yvalues - ay) / (2*(by-ay)) ) ; 
+U(1,:) = ((yvalues - ay).^2 ) .* sin( pi *(yvalues - ay) / (2*(by-ay)) ) ; 
 
 % Right boundary values (Dirchelet Condition)
-psy_ab = cos (pi*(yvalues-ay)).*cosh(by-yvalues);
+U(end,:) = cos (pi*(yvalues-ay)).*cosh(by-yvalues);
 
 % place these known values in the solution grid
-%solveing for Left and Right Boundaries
-U(1,:) = phi_ab;
-U(end,:) = psy_ab; 
+%solveing for Left and Right Boundaries 
+W(1,:)=U(1,:);
+W(end,:)=U(end,:);
+
 %H1(1,:) = phi_ab;
 %H1(end,:) = psy_ab;
 %%
@@ -57,33 +59,38 @@ F = F/R;
 R = 1;
 error=10;
 error_iterations=0;
-save('METH.mat');
-%%
-load('METH.mat');
 % check for diagonal dominance of elements
 abs(R) >= abs(2*A+2*B);
+%%
 while error>10^-10;
-   W1=U;
-   %W2=H1;
+   W=U;
+  % W2=H1;
 for j = 2:M+1;
     
     % Left boundary
+    W(j,1) = U(j,1);
     U(j,1) = (  F(j,1) - (2*B)*U(j,2) - A*U(j-1,1) - A*U(j+1,1) );
     %H1(j,1) = (  H(j,1) - (2*B)*H1(j,2) - A*H1(j-1,1) - A*H1(j+1,1) );
+    error(j,1) = abs((U(j,1) - W(j,1)) / U(j,1));
     % Right Boundary
+    W(j,end)= U(j,end);
     U(j,end) = (  F(j,end) - (2*B)*U(j,end-1) - A*U(j-1,end) - A*U(j+1,end) );
     %H1(j,end) = (  H(j,end) - (2*B)*H1(j,end-1) - A*H1(j-1,end) - A*H1(j+1,end) );
+    error(j,M+2) = abs((U(j,M+2) - W(j,M+2)) / U(j,M+2));
 end
 %% Main Sweep of Gauss-Siedel
 
-for k = 2:N+1;
-    for j = 2:M+1;
+for j= 2:M+1;
+    for k = 2:N+1;
+        W(j,k)=U(j,k);
         U(j,k) = (  F(j,k) - B*U(j,k-1) - B*U(j,k+1)- A*U(j-1,k) - A*U(j+1,k) );
+       % U(j,k) = lamda*U(j,k)+(1-lamda)*W(j,k);
        % H1(j,k) = (  H(j,k) - B*H1(j,k-1) - B*H1(j,k+1)- A*H1(j-1,k) - A*H1(j+1,k) );
+        error(j,k)= abs((U(j,k) - W(j,k)) / U(j,k));
     end
 end
-error=abs(max(max(((W1-U)./W1))));
-%error=abs(max(max(((W2-H1)./W2))));
+error=abs(max(max(((W-U)./W))));
+%error2=abs(max(max(((W2-H1)./W2))));
 error_iterations=error_iterations+1;
 end
 toc
