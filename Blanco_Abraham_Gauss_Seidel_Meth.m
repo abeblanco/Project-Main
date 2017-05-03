@@ -57,6 +57,9 @@ F = F/R;
 R = 1;
 error=10;
 error_iterations=0;
+save(METH.mat);
+%%
+load(METH.mat);
 % check for diagonal dominance of elements
 abs(R) >= abs(2*A+2*B);
 while error>10^-10;
