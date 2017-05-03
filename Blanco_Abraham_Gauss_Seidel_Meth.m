@@ -1,4 +1,4 @@
-%Code Method Gauss_Seidel METH
+%Code Method Gauss_Seidel METHOD
 % Abraham Blanco  1223970
 clear all; clc;
 tic
