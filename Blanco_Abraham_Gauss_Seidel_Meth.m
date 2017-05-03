@@ -7,42 +7,42 @@ ax = 0;
 ay = 0;
 bx = 2*pi;
 by = 2*pi;
-% Define the number of points on the interior (this does not include the
-% exterior boundary points)
+% Define the number of points on the interior (this does not include the exterior boundary points)
 M=input('Value of X Intenal Nodes=');
 N=input('Value of Y Internal Nodes=');
 M1=M+2;
 N1=N+2;
-% this generates the x and y values that will be used to calculate 
+% this generates the x and y values that will be used to calculate the F matrix
 xvalues = linspace(0,2*pi,M+2);
 yvalues = linspace(0,2*pi,N+2);
 %%
-%U matrix (guess)
+%U matrix ( initial guess)
 U = ones(M+2,N+2);
-%solving for right hand side with F equation
+%solving for right hand side (F equation)
 for i=1:length(xvalues);
     for j=1:length(yvalues);
 F(i,j) = cos ( (0.5*pi)* (2*((xvalues(i)-ax) / (bx - ax))+1 )).*sin( pi*((yvalues(j)-ay) / (by -ay)));
     end
 end
 
-%% Boundary Conditions for "top" and "bottom"
+%% Boundary Conditions for "Left" and "Right" side of Matrix
 
-% Bottom boundary values
+% Left boundary values (Dirchelet Condition)
 phi_ab = ((yvalues - ay).^2 ) .* sin( pi *(yvalues - ay) / (2*(by-ay)) ) ; 
 
-% Top boundary values
+% Right boundary values (Dirchelet Condition)
 psy_ab = cos (pi*(yvalues-ay)).*cosh(by-yvalues);
 
 % place these known values in the solution grid
+%solveing for Left and Right Boundaries
 U(1,:) = phi_ab;
 U(end,:) = psy_ab; 
-
+%%
 DX = 2*pi/(M+1);
 A = 1/DX.^2
 DY = 2*pi/(N+1);
 B = 1/DY.^2
-DEN = -2*(A+B)
+DEN = -2*(A+B);
 
 % normalize elements
 A = A/DEN;
@@ -52,7 +52,7 @@ DEN = 1;
 error=10;
 error_iterations=0
 % check for diagonal dominance of elements
-abs(DEN) >= abs(2*A+2*B)
+abs(DEN) >= abs(2*A+2*B);
 while error>10^-10;
     W=U;
 for P = 1:1000;
