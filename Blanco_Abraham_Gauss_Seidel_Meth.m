@@ -1,4 +1,4 @@
-%Code Method Gauss_Seidel METH
+%Code Method Gauss_Seidel METH Verification
 % Abraham Blanco  1223970
 clear all; clc;
 tic
