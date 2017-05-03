@@ -1,7 +1,6 @@
 %Code Method Gauss_Seidel METHOD
 % Abraham Blanco  1223970
 clear all; clc;
-tic
 %% Parameters
 ax = 0;
 ay = 0;
@@ -10,6 +9,7 @@ by = 2*pi;
 % Define the number of points on the interior (this does not include the exterior boundary points)
 M=input('Value of X Intenal Nodes=');
 N=input('Value of Y Internal Nodes=');
+tic %time begins here after inputs are set
 M1=M+2;
 N1=N+2;
 % this generates the x and y values that will be used to calculate the F matrix
@@ -43,9 +43,9 @@ H1(1,:) = phi_ab;
 H1(end,:) = psy_ab;
 %%
 DX = 2*pi/(M+1);
-A = 1/DX.^2
+A = 1/DX.^2;
 DY = 2*pi/(N+1);
-B = 1/DY.^2
+B = 1/DY.^2;
 DEN = -2*(A+B);
 
 % normalize elements
@@ -56,7 +56,7 @@ H = H/DEN;
 
 DEN = 1;
 error=10;
-error_iterations=0
+error_iterations=0;
 % check for diagonal dominance of elements
 abs(DEN) >= abs(2*A+2*B);
 while error>10^-10;
@@ -81,9 +81,10 @@ for k = 2:N+1;
 end
 error=abs(max(max(((W1-U)./W1))));
 error=abs(max(max(((W2-H1)./W2))));
-error_iterations=error_iterations+1
+error_iterations=error_iterations+1;
 end
 toc
+error_iterations
 figure
 subplot(1,2,1),surf(U), xlabel('Y axis'), ylabel('X axis'), zlabel('Z axis'), title('F=cosx*siny')
 subplot(1,2,2),contour(U), xlabel('Y axis'), ylabel('X axis'), title('F=cosx*siny')
