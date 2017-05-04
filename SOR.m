@@ -19,21 +19,20 @@ yvalues = linspace(0,2*pi,N+2);
 %%
 %U matrix ( initial guess)
 U = ones(M+2,N+2);
-%H1= ones(M+2,N+2);
 %solving for right hand side (F equation)
 for i=1:length(xvalues);
     for j=1:length(yvalues);
-F(i,j) = cos ( (0.5*pi)* (2*((xvalues(i)-ax) / (bx - ax))+1 )).*sin( pi*((yvalues(j)-ay) / (by -ay)));
-%H(i,j) = 0; %last simulation with F=0
+F(i,j) = cos ( (0.5*pi)* (2*((xvalues(i)-ax) / (bx - ax))+1 )).*sin( pi*((yvalues(j)-ay) / (by -ay))); %given initial Function
+%F(i,j) = 0; %last simulation with F=0 uncomment when using F=0
     end
 end
 
 %% Boundary Conditions for "Left" and "Right" side of Matrix
 
-% Left boundary values (Dirchelet Condition)
+% Top boundary values (Dirchelet Condition)
 phi_ab = ((yvalues - ay).^2 ) .* sin( pi *(yvalues - ay) / (2*(by-ay)) ) ; 
 
-% Right boundary values (Dirchelet Condition)
+% Bottom boundary values (Dirchelet Condition)
 psy_ab = cos (pi*(yvalues-ay)).*cosh(by-yvalues);
 
 % place these known values in the solution grid
