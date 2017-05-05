@@ -1,4 +1,4 @@
-%Code Method Gauss_Seidel METHOD
+%Code Method Gauss_Seidel METHOD with Successive Over Relaxation
 % Abraham Blanco  1223970
 clear all; clc;
 %% Parameters
@@ -27,7 +27,7 @@ F(i,j) = cos ( (0.5*pi)* (2*((xvalues(i)-ax) / (bx - ax))+1 )).*sin( pi*((yvalue
     end
 end
 
-%% Boundary Conditions for "Left" and "Right" side of Matrix
+%% Boundary Conditions for "Top" and "BGttom" side of Matrix
 
 % Top boundary values (Dirchelet Condition)
 phi_ab = ((yvalues - ay).^2 ) .* sin( pi *(yvalues - ay) / (2*(by-ay)) ) ; 
@@ -41,9 +41,6 @@ U(1,:) = phi_ab;
 U(end,:) = psy_ab; 
 W(1,:)=U(1,:);
 W(end,:)=U(end,:);
-
-%H1(1,:) = phi_ab;
-%H1(end,:) = psy_ab;
 %%
 DX = 2*pi/(M+1);
 A = 1/DX.^2;
@@ -55,8 +52,6 @@ R = -2*(A+B);
 A = A/R;
 B = B/R;
 F = F/R;
-%H = H/R;
-
 R = 1;
 error=10;
 error_iterations=0;
@@ -65,18 +60,15 @@ abs(R) >= abs(2*A+2*B);
 %%
 while error>10^-10;
    W=U;
-  % W2=H1;
 for j = 2:M+1;
     
     % Left boundary
     W(j,1) = U(j,1);
     U(j,1) = (  F(j,1) - (2*B)*U(j,2) - A*U(j-1,1) - A*U(j+1,1) );
-    %H1(j,1) = (  H(j,1) - (2*B)*H1(j,2) - A*H1(j-1,1) - A*H1(j+1,1) );
     error(j,1) = abs((U(j,1) - W(j,1)) / U(j,1));
     % Right Boundary
     W(j,end)= U(j,end);
     U(j,end) = (  F(j,end) - (2*B)*U(j,end-1) - A*U(j-1,end) - A*U(j+1,end) );
-    %H1(j,end) = (  H(j,end) - (2*B)*H1(j,end-1) - A*H1(j-1,end) - A*H1(j+1,end) );
     error(j,M+2) = abs((U(j,M+2) - W(j,M+2)) / U(j,M+2));
 end
 %% Main Sweep of Gauss-Siedel
@@ -85,12 +77,10 @@ for k = 2:N+1;
     for j = 2:M+1;
         U(j,k) = (  F(j,k) - B*U(j,k-1) - B*U(j,k+1)- A*U(j-1,k) - A*U(j+1,k) );
         U(j,k) = lamda*U(j,k)+(1-lamda)*W(j,k);
-       % H1(j,k) = (  H(j,k) - B*H1(j,k-1) - B*H1(j,k+1)- A*H1(j-1,k) - A*H1(j+1,k) );
         error(j,k)= abs((U(j,k) - W(j,k)) / U(j,k));
     end
 end
 error=abs(max(max(((W-U)./W))));
-%error2=abs(max(max(((W2-H1)./W2))));
 error_iterations=error_iterations+1;
 end
 toc
@@ -98,6 +88,3 @@ error_iterations
 figure
 subplot(1,2,1),surf(U), xlabel('Y axis'), ylabel('X axis'), zlabel('Z axis'), title('F=cosx*siny')
 subplot(1,2,2),contour(U), xlabel('Y axis'), ylabel('X axis'), title('F=cosx*siny')
-%figure
-%subplot(1,2,1),surf(H1), xlabel('Y axis'), ylabel('X axis'), zlabel('Z axis'), title('F=0')
-%subplot(1,2,2),contour(H1), xlabel('Y axis'), ylabel('X axis'), title('F=0')
