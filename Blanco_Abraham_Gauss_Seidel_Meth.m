@@ -56,7 +56,7 @@ save('variables.mat')
 load('variables.mat')
 while error>10^-10;
    T_loop=tic;
-   if Time_count>=6
+   if Time_count>=6 %check pointing
        Time_count=0;
        save('variables.mat')
    end
