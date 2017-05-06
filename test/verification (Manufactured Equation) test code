@@ -1,0 +1,89 @@
+%%%%%% Code Method 1 %%%%%%%%
+% Abraham Blanco 1223970
+clear all; clc;
+tic
+%% Parameters
+
+% Define the number of points on the interior (this does not include the
+% exterior boundary points)
+numX = 64;
+numY = 64;
+numXp1 = numX +1;
+numYp1 = numY +1;
+numXp2 = numXp1 +1;
+numYp2 = numYp1 +1;
+
+% this generates the x and y values that will be used to calculate 
+xvalues = linspace(0,2*pi,numX+2);
+yvalues = linspace(0,2*pi,numX+2);
+for i=numXp2
+    for j=numYp2
+        U(i,j)=1+xvalues(i)^2+2.*yvalues(j)^2;
+    end
+end
+F = -6;
+% F=zeros(numXp2,numYp2);
+
+% Bounds for the Equation 
+ax = 0;
+ay = 0;
+bx = 2*pi;
+by = 2*pi;
+%% Boundary Conditions for "top" and "bottom"
+
+% Bottom boundary values
+phi_y = ((yvalues - ay).^2 ) .* sin( pi *(yvalues - ay) / (2*(by-ay)) ) ; 
+
+% Top boundary values
+psy_y = cos (pi*(yvalues-ay)).*cosh(by-yvalues);
+
+% place these known values in the solution grid
+U(1,:) = phi_y;
+U(end,:) = psy_y; 
+%% Left and Right Boundary points 
+%   Using the given neumann condition yields special cases of the
+%   gauss-siedel iteration that can be used along entire "side" boundaries.
+%   F is already assumed to have been generated as well as U solution grid
+% Parameters that are used in the iterations.
+DX = 2*pi/(numX+1);
+DX = 1/DX.^2
+DY = 2*pi/(numY+1);
+DY = 1/DY.^2
+DEN = -2*(DX+DY)
+
+% normalize elements
+DX = DX/DEN;
+DY = DY/DEN;
+F = F/DEN;
+DEN = 1;
+error=10;
+error_iterations=0
+% check for diagonal dominance of elements
+abs(DEN) >= abs(2*DX+2*DY)
+while error>10^-10;
+    B=U
+for P = 1:1000;
+% Left boundary
+for j = 2:numYp1;
+    U(j,1) = DEN*(  F - (2*DY)*U(j,2) - DX*U(j-1,1) - DX*U(j+1,1) );
+end
+
+% Right Boundary
+for j = 2:numYp1;
+    U(j,end) = DEN*(  F - (2*DY)*U(j,end-1) - DX*U(j-1,end) - DX*U(j+1,end) );
+end
+%% Main Sweep of Gauss-Siedel
+
+for k = 2:numXp1;
+    for j = 2:numYp1;
+        U(j,k) = DEN*(  F - DY*U(j,k-1) - DY*U(j,k+1)- DX*U(j-1,k) - DX*U(j+1,k) );
+    end
+end
+end
+error=abs(max(max(((B-U)./B))));
+error_iterations=error_iterations+1
+end
+toc
+figure
+subplot(1,2,1),surf(U)
+subplot(1,2,2),contour(U)
