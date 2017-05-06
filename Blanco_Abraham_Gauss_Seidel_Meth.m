@@ -10,7 +10,7 @@ by = 2*pi;
 %lamda=input('Value of lamda=');
 M=input('Value of X Intenal Nodes=');
 N=input('Value of Y Internal Nodes=');
-tic %time begins here after inputs are set
+Time=tic' %time begins here after inputs are set
 M1=M+2;
 N1=N+2;
 % this generates the x and y values that will be used to calculate the F matrix
@@ -18,7 +18,7 @@ xvalues = linspace(0,2*pi,M+2);
 yvalues = linspace(0,2*pi,N+2);
 %%
 %U matrix ( initial guess)
-U = ones(M+2,N+2);
+U = ones(M+2,N+2); %preallocation (optmization)
 %solving for right hand side (F equation)
 for i=1:length(xvalues);
     for j=1:length(yvalues);
@@ -41,7 +41,6 @@ A = 1/DX.^2;
 DY = 2*pi/(N+1);
 B = 1/DY.^2;
 R = -2*(A+B);
-
 % normalize elements
 A = A/R;
 B = B/R;
@@ -51,10 +50,17 @@ error=10;
 error_iterations=0;
 % check for diagonal dominance of elements
 abs(R) >= abs(2*A+2*B);
+Time_count=0;
+save('variables.mat')
 %%
+load('variables.mat')
 while error>10^-10;
-   W=U;
-  % W2=H1;
+   T_loop=tic;
+   if Time_count>=6
+       Time_count=0;
+       save('variables.mat')
+   end
+    W=U;
 for j = 2:M+1;
     
     % Left boundary
@@ -77,8 +83,14 @@ for j= 2:M+1;
 end
 error=abs(max(max(((W-U)./W))));
 error_iterations=error_iterations+1;
+P= toc(T_loop); 
+Time_count=Time_count + P;
 end
-toc
+toc(Time)
+save('variables.mat')
+%%
+load('variables.mat')
+Grid=mean(mean(U.^2))
 error_iterations
 figure
 subplot(1,2,1),surf(U), xlabel('Y axis'), ylabel('X axis'), zlabel('Z axis'), title('F=cosx*siny')
